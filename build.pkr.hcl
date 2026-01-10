@@ -11,6 +11,11 @@ build {
     destination = "/opt/guacamole/docker-compose.yml"
   }
 
+  provisioner "file" {
+    source      = "files/dynamic_conf/"
+    destination = "/opt/guacamole/dynamic_conf/"
+  }
+
   provisioner "shell" {
     script = "scripts/setup-docker.sh"
   }

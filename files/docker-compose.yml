@@ -17,11 +17,14 @@ services:
       - "8080:8080" # Dashboard (Tắt khi ra production)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./dynamic_conf:/etc/traefik/dynamic_conf:ro
     command:
       - "--api.dashboard=false" # Tắt dashboard public
       - "--api.insecure=true"   # Chỉ bật nội bộ nếu cần debug
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.directory=/etc/traefik/dynamic_conf"
+      - "--providers.file.watch=true"
       - "--entrypoints.web.address=:80"
       - "--log.level=ERROR"
     networks:
@@ -78,17 +81,9 @@ services:
       - "initdb:/opt/guacamole/extensions/guacamole-auth-jdbc/postgresql/schema:ro"
     labels:
       - "traefik.enable=true"
-      
-      # FIX LỖI 504: Chỉ định chính xác mạng (tên thư mục_tên mạng)
-      # Lưu ý: Packer copy vào /opt/guacamole -> Tên mạng sẽ là guacamole_proxy_net
       - "traefik.docker.network=guacamole_proxy_net"
-      
-      # FIX LỖI ROUTING: Chỉ định port của Tomcat
       - "traefik.http.services.guac.loadbalancer.server.port=8080"
-
-      # FIX LỖI 404: Redirect từ / vào /guacamole/
-      # (Cách đơn giản nhất: Chạy thẳng trên /guacamole)
-      - "traefik.http.routers.guac.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.guac.rule=Host(`guacamole.cyber-range.local`)"
       - "traefik.http.routers.guac.entrypoints=web"
       
       # Middleware thêm prefix /guacamole nếu user gõ /

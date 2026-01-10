@@ -1,0 +1,21 @@
+http:
+  routers:
+    # Router cho Wazuh
+    wazuh-router:
+      rule: "Host(`wazuh.cyber-range.local`)"
+      service: "wazuh-external"
+      entryPoints:
+        - "web"
+
+  services:
+    # Service trỏ về IP tĩnh của Wazuh
+    wazuh-external:
+      loadBalancer:
+        servers:
+          - url: "https://172.16.99.11:443"
+        serversTransport: "wazuh-transport"
+
+  serversTransports:
+    # Bỏ qua lỗi SSL (Self-signed cert) của Wazuh
+    wazuh-transport:
+      insecureSkipVerify: true
