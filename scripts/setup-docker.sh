@@ -1,5 +1,7 @@
 #!/bin/sh
 
+chmod +x /usr/local/bin/proxy-ctl
+
 # 1. Cài đặt Docker và Compose
 echo "[+] Installing Docker..."
 apk update

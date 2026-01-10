@@ -16,6 +16,11 @@ build {
     destination = "/opt/guacamole/dynamic_conf/"
   }
 
+  provisioner "file" {
+    source      = "scripts/manage-proxy.sh"
+    destination = "/usr/local/bin/proxy-ctl"
+  }
+
   provisioner "shell" {
     script = "scripts/setup-docker.sh"
   }
