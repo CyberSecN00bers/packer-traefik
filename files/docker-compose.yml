@@ -1,4 +1,4 @@
-services:
+﻿services:
   # ==========================================
   # TRAEFIK (Reverse Proxy)
   # ==========================================
@@ -8,19 +8,19 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    # Fix lỗi API Docker version cũ trên Alpine
+    # Fix Docker API version mismatch on Alpine
     environment:
       - DOCKER_API_VERSION=1.44
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080" # Dashboard (Tắt khi ra production)
+      - "8080:8080" # Dashboard (disable for production)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./dynamic_conf:/etc/traefik/dynamic_conf:ro
     command:
-      - "--api.dashboard=false" # Tắt dashboard public
-      - "--api.insecure=true"   # Chỉ bật nội bộ nếu cần debug
+      - "--api.dashboard=false" # Disable public dashboard
+      - "--api.insecure=true"   # Enable internal dashboard for debug only
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.file.directory=/etc/traefik/dynamic_conf"
@@ -30,72 +30,6 @@ services:
     networks:
       - proxy_net
 
-  # ==========================================
-  # POSTGRES (Database)
-  # ==========================================
-  guac-postgres:
-    image: postgres:15-alpine
-    container_name: guac_postgres
-    restart: always
-    environment:
-      PGDATA: /var/lib/postgresql/data/guacamole
-      POSTGRES_DB: guacamole_db
-      POSTGRES_USER: guac_user
-      POSTGRES_PASSWORD: 'MySuperSecretPassword123' 
-    volumes:
-      - "initdb:/docker-entrypoint-initdb.d:ro"
-      - guac_db_data:/var/lib/postgresql/data
-    networks:
-      - internal_net
-
-  # ==========================================
-  # GUACD (Backend Daemon)
-  # ==========================================
-  guacd:
-    image: guacamole/guacd
-    container_name: guacd
-    restart: always
-    networks:
-      - internal_net
-
-  # ==========================================
-  # GUACAMOLE (Frontend Web App)
-  # ==========================================
-  guacamole:
-    image: guacamole/guacamole
-    container_name: guacamole
-    restart: always
-    depends_on:
-      - guac-postgres
-      - guacd
-    environment:
-      GUACD_HOSTNAME: guacd
-      POSTGRESQL_HOSTNAME: guac-postgres
-      POSTGRESQL_DATABASE: guacamole_db
-      POSTGRESQL_USER: guac_user
-      POSTGRESQL_PASSWORD: 'MySuperSecretPassword123'
-    networks:
-      - internal_net
-      - proxy_net
-    volumes:
-      - "initdb:/opt/guacamole/extensions/guacamole-auth-jdbc/postgresql/schema:ro"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=guacamole_proxy_net"
-      - "traefik.http.services.guac.loadbalancer.server.port=8080"
-      - "traefik.http.routers.guac.rule=Host(`guacamole.cyber-range.local`)"
-      - "traefik.http.routers.guac.entrypoints=web"
-      
-      # Middleware thêm prefix /guacamole nếu user gõ /
-      - "traefik.http.middlewares.add-guac-prefix.addprefix.prefix=/guacamole"
-      - "traefik.http.routers.guac.middlewares=add-guac-prefix"
-
 networks:
   proxy_net:
     driver: bridge
-  internal_net:
-    driver: bridge
-
-volumes:
-  guac_db_data:
-  initdb:

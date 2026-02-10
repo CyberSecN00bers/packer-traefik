@@ -1,19 +1,19 @@
-build {
+﻿build {
   sources = ["source.proxmox-iso.alpine_docker"]
 
-  # 1. Upload file docker-compose
+  # 1. Upload docker-compose
   provisioner "shell" {
-    inline = ["mkdir -p /opt/guacamole"]
+    inline = ["mkdir -p /opt/traefik"]
   }
 
   provisioner "file" {
     source      = "files/docker-compose.yml"
-    destination = "/opt/guacamole/docker-compose.yml"
+    destination = "/opt/traefik/docker-compose.yml"
   }
 
   provisioner "file" {
     source      = "files/dynamic_conf/"
-    destination = "/opt/guacamole/dynamic_conf/"
+    destination = "/opt/traefik/dynamic_conf/"
   }
 
   provisioner "file" {

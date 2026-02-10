@@ -1,4 +1,4 @@
-# ==========================================
+﻿# ==========================================
 # PROXMOX CONNECTION
 # ==========================================
 proxmox_url      = "https://10.10.100.1:8006/api2/json"
@@ -10,8 +10,8 @@ proxmox_node     = "homelab"
 # STORAGE
 # Or set ENV: PKR_VAR_iso_storage_pool, PKR_VAR_vm_storage_pool
 # ==========================================
-# iso_storage_pool      = "local"
-# vm_storage_pool       = "local-lvm"
+# iso_storage_pool       = "local"
+# vm_storage_pool        = "local-lvm"
 # cloudinit_storage_pool = ""  # If empty, use vm_storage_pool
 
 # ==========================================
@@ -22,7 +22,7 @@ ssh_public_key       = "ssh-ed25519 AAAAC..........."
 ssh_private_key_file = "/tmp/ssh/pri_key"
 
 # ==========================================
-# NETWORK (Guacamole chỉ cần LAN)
+# NETWORK (Traefik only needs LAN)
 # Or set ENV: PKR_VAR_bridge_lan
 # ==========================================
 bridge_lan = "nonet"

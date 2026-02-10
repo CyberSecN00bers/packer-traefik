@@ -24,8 +24,8 @@ source "proxmox-iso" "alpine_docker" {
 
   # Hardware (Up RAM/Disk for Docker)
   vm_name              = var.vm_name
-  template_name        = "tpl-guacamole"
-  template_description = "Alpine Docker Host (Traefik + Guacamole)"
+  template_name        = "tpl-traefik"
+  template_description = "Alpine Docker Host (Traefik only)"
   memory               = 2048   # 2GB RAM
   cores                = 2
   sockets              = 1
@@ -40,7 +40,7 @@ source "proxmox-iso" "alpine_docker" {
     format       = "raw"
   }
 
-  # Network (just use LAN bridge for Guacamole)
+  # Network (just use LAN bridge for Traefik)
   network_adapters {
     model    = "virtio"
     bridge   = var.bridge_lan

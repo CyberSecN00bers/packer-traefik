@@ -1,7 +1,7 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # ==============================================================================
-# SCRIPT QUẢN LÝ TRAEFIK DYNAMIC CONFIG
+# TRAEFIK DYNAMIC CONFIG MANAGER
 # ==============================================================================
 # Usage:
 #   ./manage-proxy.sh add <domain> <url> <verify_tls: true|false>
@@ -12,16 +12,16 @@
 #   ./manage-proxy.sh del wazuh.local
 # ==============================================================================
 
-# Cấu hình đường dẫn tới thư mục chứa file yaml
-# Nếu chạy trên máy local (trước khi build Packer):
+# Config directory for yaml files
+# For local run before packer build:
 # CONFIG_DIR="./files/dynamic_conf"
 
-# Nếu chạy trên server thật (sau khi deploy):
-CONFIG_DIR="/opt/guacamole/dynamic_conf"
+# For real server (after deploy):
+CONFIG_DIR="/opt/traefik/dynamic_conf"
 
 mkdir -p "$CONFIG_DIR"
 
-# Hàm hiển thị hướng dẫn sử dụng
+# Show usage
 show_help() {
     echo "Usage: $0 {add|del} [arguments]"
     echo ""
@@ -37,13 +37,13 @@ show_help() {
     exit 1
 }
 
-# Hàm chuẩn hóa tên file từ domain (thay dấu . bằng _)
+# Normalize filename from domain (replace dots with underscores)
 sanitize_filename() {
     echo "$1" | sed 's/\./_/g'
 }
 
 # ==============================================================================
-# LOGIC CHÍNH
+# MAIN LOGIC
 # ==============================================================================
 
 ACTION=$1
@@ -56,7 +56,7 @@ case "$ACTION" in
     "add")
         DOMAIN=$2
         TARGET=$3
-        VERIFY_TLS=${4:-true} # Mặc định là true nếu không nhập
+        VERIFY_TLS=${4:-true} # Default true if not provided
 
         if [ -z "$DOMAIN" ] || [ -z "$TARGET" ]; then
             echo "[ERROR] Missing domain or target URL."
@@ -66,15 +66,14 @@ case "$ACTION" in
         FILENAME=$(sanitize_filename "$DOMAIN")
         FILEPATH="$CONFIG_DIR/${FILENAME}.yml"
 
-        # Tách scheme (http/https) và address từ Target URL
-        # Nếu user nhập 172.16.0.1:443 -> Mặc định hiểu là http nếu không có prefix
+        # Ensure scheme (http/https). If only host:port given, default to http.
         if [[ "$TARGET" != http* ]]; then
             TARGET="http://$TARGET"
         fi
 
         echo "[INFO] Generating config for $DOMAIN -> $TARGET (Verify TLS: $VERIFY_TLS)..."
 
-        # Tạo nội dung YAML
+        # Write YAML
 cat > "$FILEPATH" <<EOF
 http:
   routers:

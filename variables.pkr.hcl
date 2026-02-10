@@ -71,5 +71,5 @@ variable "vlan_tag" {
 variable "vm_name" {
   description = "Name of the VM during build"
   type        = string
-  default     = "guacamole-mgmt"
+  default     = "traefik-mgmt"
 }

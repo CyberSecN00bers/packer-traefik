@@ -1,6 +1,6 @@
-KEYMAPOPTS="us us"
-HOSTNAMEOPTS="-n guacamole"
-# Networking: eth0 DHCP (để Packer SSH vào)
+﻿KEYMAPOPTS="us us"
+HOSTNAMEOPTS="-n traefik"
+# Networking: eth0 DHCP (for Packer SSH)
 INTERFACESOPTS="auto lo
 iface lo inet loopback
 
