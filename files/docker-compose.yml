@@ -34,7 +34,7 @@
   # QDRANT (Vector DB)
   # ==========================================
   qdrant:
-    image: qdrant/qdrant:v1.9.0
+    image: qdrant/qdrant:v1.16.3
     container_name: qdrant
     restart: unless-stopped
     environment:
@@ -44,6 +44,7 @@
       - "6333:6333"
       - "6334:6334"
     volumes:
+      - /opt/qdrant/bootstrap:/qdrant/snapshots
       - /opt/qdrant/storage:/qdrant/storage
     networks:
       - proxy_net
